@@ -2,19 +2,20 @@ package ExpensesDashboard.Application.Services;
 
 import ExpensesDashboard.Application.DTOs.ExpenseRequestDto;
 import ExpensesDashboard.Application.DTOs.UpdateExpenseRequestDto;
+import ExpensesDashboard.Domain.Enums.ExpenseType;
 import ExpensesDashboard.Infra.Data.ExpenseRepository;
 import ExpensesDashboard.Infra.Data.UserRepository;
 import ExpensesDashboard.Domain.Entities.Expense;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class ExpenseService {
-    @Autowired
     private final ExpenseRepository repository;
-    @Autowired
     private final UserRepository userRepository;
 
     public boolean create(ExpenseRequestDto expenseToCreate){
@@ -27,6 +28,7 @@ public class ExpenseService {
         newExpense.setName(expenseToCreate.name());
         newExpense.setAmount(expenseToCreate.amount());
         newExpense.setType(expenseToCreate.type());
+        newExpense.setCreatedAt(LocalDateTime.now());
         newExpense.setUser(user.get());
 
         repository.save(newExpense);
@@ -42,6 +44,11 @@ public class ExpenseService {
                     expense.setAmount(updatedExpense.amount());
                     return repository.save(expense);
                 }).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+    }
+
+    public List<Expense> getByType(String type){
+        var expenseType = ExpenseType.valueOf(type);
+        return repository.findByType(expenseType);
     }
 
 
