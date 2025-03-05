@@ -7,6 +7,8 @@ import ExpensesDashboard.Application.DTOs.RegisterResponseDto;
 import ExpensesDashboard.Infra.Data.UserRepository;
 import ExpensesDashboard.Domain.Entities.User;
 import ExpensesDashboard.Infra.Config.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,22 +20,16 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Usuários", description = "Gerenciamento de usuários")
 public class AuthController {
     private final UserRepository _repository;
     private final PasswordEncoder _passwordEncoder;
     private final TokenService _tokenService;
 
-    @GetMapping
-    public ResponseEntity getLogin(){
-        List<User> user = _repository.findAll();
-
-        if(user.isEmpty()){
-            return ResponseEntity.badRequest().body("No tips found");
-        }
-
-        return  ResponseEntity.ok(user);
-    }
-
+    @Operation(
+            summary = "Autenticação do usuário",
+            description = "Executa a autenticação para o usuário"
+    )
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDto body){
         User user = _repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
@@ -46,6 +42,10 @@ public class AuthController {
         return  ResponseEntity.badRequest().build();
     }
 
+    @Operation(
+            summary = "Cadastro de usuários",
+            description = "Executa o cadastro de um usuário"
+    )
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequestDto body){
         Optional<User> user = _repository.findByEmail(body.email());
