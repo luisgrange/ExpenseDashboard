@@ -1,0 +1,76 @@
+<section id="dashboard">
+    <section id="top-bar" class="border-bottom-primary">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container d-flex align-items-center">
+              <a class="navbar-brand" href="#">DEV - Expense tracker</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="d-flex align-items-center" id="navbarSupportedContent">
+                <div class="user">
+                    <p>Olá, {{loggedUser}}</p>
+                </div>
+              </div>
+            </div>
+          </nav>
+    </section>
+
+    <section id="content">
+        <section id="sidebar">
+            <div class="sidebar bg-body-tertiary">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#services">Services</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </section>
+
+        <section class="expenses-content">
+            <h2 class="mb-5">Dashboard</h2>
+            <div class="boxes-container mb-5">
+                <div class="info-box">
+                    <div class="title">Saldo atual</div>
+                    <div class="resume">R$ 00,00</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="title">Total gasto</div>
+                    <div class="resume">R$ 00,00</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="title">Total restante</div>
+                    <div class="resume">R$ 00,00</div>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex justify-content-between gap-4">
+                <div class="table-container">
+                    <h3>Últimos gastos:</h3>
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Valor</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let expense of expenses">
+                            <td>{{expense.name}}</td>
+                            <td>{{expense.type}}</td>
+                            <td>{{expense.amount}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                </div>
+
+                <div class="dashboard-container">
+                    <h3>Gastos por tipo</h3>
+
+                    teste
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
