@@ -26,17 +26,6 @@ public class AuthController {
     private final PasswordEncoder _passwordEncoder;
     private final TokenService _tokenService;
 
-//    @GetMapping
-//    public ResponseEntity getLogin(){
-//        List<User> user = _repository.findAll();
-//
-//        if(user.isEmpty()){
-//            return ResponseEntity.badRequest().body("No tips found");
-//        }
-//
-//        return  ResponseEntity.ok(user);
-//    }
-
     @Operation(
             summary = "Autenticação do usuário",
             description = "Executa a autenticação para o usuário"
