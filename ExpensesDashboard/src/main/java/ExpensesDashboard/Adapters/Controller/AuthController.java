@@ -1,32 +1,24 @@
 package ExpensesDashboard.Adapters.Controller;
 
 import ExpensesDashboard.Application.DTOs.LoginRequestDto;
-import ExpensesDashboard.Application.DTOs.LoginResponseDto;
 import ExpensesDashboard.Application.DTOs.RegisterRequestDto;
-import ExpensesDashboard.Application.DTOs.RegisterResponseDto;
-import ExpensesDashboard.Domain.Entities.User;
-import ExpensesDashboard.Infra.Config.TokenService;
-import ExpensesDashboard.Infra.Data.UserRepository;
+import ExpensesDashboard.Application.Services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Usuários", description = "Gerenciamento de usuários")
 public class AuthController {
-    private final UserRepository _repository;
-    private final PasswordEncoder _passwordEncoder;
-    private final TokenService _tokenService;
+    private final UserService _service;
 
     @Operation(
             summary = "Autenticação do usuário",
@@ -34,14 +26,12 @@ public class AuthController {
     )
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDto body){
-        User user = _repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
+        var request = _service.login(body);
 
-        if(_passwordEncoder.matches(body.password(), user.getPassword())){
-            String token = _tokenService.GenerateToken(user);
-            return ResponseEntity.ok(new LoginResponseDto(user.getId(),user.getName(), token));
-        }
+        if(request.isEmpty())
+            return  ResponseEntity.badRequest().build();
 
-        return  ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(request);
     }
 
     @Operation(
@@ -50,22 +40,11 @@ public class AuthController {
     )
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequestDto body){
-        Optional<User> user = _repository.findByEmail(body.email());
-        if(user.isEmpty()){
-            User newUser = new User();
-            newUser.setPassword(_passwordEncoder.encode(body.password()));
-            newUser.setEmail(body.email());
-            newUser.setName(body.name());
-            newUser.setRole("User");
-            newUser.setSalary(body.salary());
+        var request = _service.create(body);
+        if(!request)
+            return  ResponseEntity.badRequest().build();
 
-            _repository.save(newUser);
-
-            String token = _tokenService.GenerateToken(newUser);
-            return ResponseEntity.ok(new RegisterResponseDto(newUser.getName(), token));
-        }
-
-        return  ResponseEntity.badRequest().build();
+        return ResponseEntity.ok("Registered successfully");
     }
 
 }

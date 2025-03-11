@@ -8,8 +8,11 @@ import ExpensesDashboard.Domain.Entities.Expense;
 import ExpensesDashboard.Application.Services.ExpenseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Despesas", description = "Gerenciamento de despesas dos usuários")
 public class ExpenseController {
-    private final ExpenseRepository _expenseRepository;
     private final ExpenseService service;
 
     @Operation(
@@ -32,7 +34,7 @@ public class ExpenseController {
     @ApiResponse(responseCode = "401", description = "Autenticação necessária")
     @GetMapping
     public ResponseEntity getExpenses(){
-        List<Expense> expenses = _expenseRepository.findAll();
+        List<Expense> expenses = service.getExpenses();
 
         if(expenses.isEmpty()){
             return ResponseEntity.badRequest().body("No tips found");
@@ -64,9 +66,33 @@ public class ExpenseController {
     @ApiResponse(responseCode = "400", description = "ID inválido ou erro na requisição")
     @ApiResponse(responseCode = "401", description = "Autenticação necessária")
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody UpdateExpenseRequestDto body) {
-        var result = service.UpdateExpense(id, body);
+    public ResponseEntity<?> update(HttpServletRequest request, @RequestBody UpdateExpenseRequestDto body) {
+        var loggedUserId = (String) request.getAttribute("userId");
+
+        if(loggedUserId == null)
+            return ResponseEntity.status(401).build();
+
+        var result = service.UpdateExpense(loggedUserId, body);
         return ResponseEntity.ok(result.id);
+    }
+
+    @Operation(
+            summary = "Exclusão de despesa com base no ID",
+            description = "Exclui uma despesa pelo seu ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Despesa excluída com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Despesa não encontrada"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+    })
+    @DeleteMapping("/expense/{expenseId}")
+    public ResponseEntity<Void> deleteExpense(@PathVariable String expenseId) {
+        boolean isDeleted = service.deleteExpense(expenseId);
+
+        if (isDeleted)
+            return ResponseEntity.noContent().build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @Operation(
