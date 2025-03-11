@@ -7,6 +7,8 @@ import ExpensesDashboard.Infra.Data.ExpenseRepository;
 import ExpensesDashboard.Infra.Data.UserRepository;
 import ExpensesDashboard.Domain.Entities.Expense;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,12 @@ public class ExpenseService {
     private final ExpenseRepository repository;
     private final UserRepository userRepository;
 
+
+    public List<Expense> getExpenses(){
+        List<Expense> expenses = repository.findAll();
+
+        return expenses;
+    }
     public boolean create(ExpenseRequestDto expenseToCreate){
         var user = userRepository.findByEmail(expenseToCreate.userEmail());
         if(user.isEmpty()){
@@ -49,6 +57,20 @@ public class ExpenseService {
     public List<Expense> getByType(String type){
         var expenseType = ExpenseType.valueOf(type);
         return repository.findByType(expenseType);
+    }
+
+    public boolean deleteExpense(String id){
+        try {
+
+            if (repository.existsById(id)) {
+                repository.deleteById(id);
+                return true;
+            }
+
+            return false;
+        } catch (DataAccessException e) {
+            return false;
+        }
     }
 
 
