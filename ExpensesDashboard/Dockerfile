@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /app
 
 # Copiar o arquivo JAR do Spring Boot para o container
-COPY target/expenses-dashboard.jar app.jar
+COPY target/expense-dashboard.jar app.jar
 
 # Expor a porta 8080
 EXPOSE 8080
