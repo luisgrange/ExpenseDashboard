@@ -21,7 +21,6 @@ import java.util.List;
 @Tag(name = "Despesas", description = "Gerenciamento de despesas dos usuários")
 public class ExpenseController {
     private final ExpenseRepository _expenseRepository;
-    private final UserRepository _userRepository;
     private final ExpenseService service;
 
     @Operation(
